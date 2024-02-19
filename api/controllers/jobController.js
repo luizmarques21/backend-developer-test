@@ -19,5 +19,10 @@ module.exports = () => {
         return res.sendStatus(200);
     }
 
+    controller.publishJob = async (req, res) => {
+        await db.publishJob(req.params.job_id);
+        return res.sendStatus(200);
+    }
+
     return controller;
 }

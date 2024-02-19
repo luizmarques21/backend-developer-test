@@ -3,4 +3,5 @@ module.exports = app => {
 
     app.post('/job', controller.saveJobDraft);
     app.put('/job/:job_id', controller.updateJob);
+    app.put('/job/:job_id/publish', controller.publishJob);
 }
