@@ -47,4 +47,18 @@ async function publishJob(job_id) {
     await client.query(sql, values);
 }
 
-module.exports = { listCompanies, getCompany, saveJobDraft, updateJob, publishJob }
+async function archiveJob(job_id) {
+    const client = await connect();
+    const sql = 'UPDATE jobs SET status = $1 WHERE id = $2';
+    const values = ['archived', job_id];
+    await client.query(sql, values);
+}
+
+module.exports = { 
+    listCompanies, 
+    getCompany, 
+    saveJobDraft, 
+    updateJob, 
+    publishJob,
+    archiveJob
+}

@@ -24,5 +24,10 @@ module.exports = () => {
         return res.sendStatus(200);
     }
 
+    controller.archiveJob = async (req, res) => {
+        await db.archiveJob(req.params.job_id);
+        return res.sendStatus(200);
+    }
+
     return controller;
 }
