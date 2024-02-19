@@ -26,4 +26,11 @@ async function getCompany(companyId) {
     return res.rows[0];
 }
 
-module.exports = { listCompanies, getCompany }
+async function saveJobDraft(newJob) {
+    const client = await connect();
+    const sql = 'INSERT INTO jobs(company_id, title, description, location, notes) VALUES ($1, $2, $3, $4, $5)';
+    const values = [newJob.company_id, newJob.title, newJob.description, newJob.location, newJob.notes];
+    await client.query(sql, values);
+}
+
+module.exports = { listCompanies, getCompany, saveJobDraft }

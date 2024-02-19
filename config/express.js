@@ -11,6 +11,7 @@ module.exports = () => {
     app.use(bodyParser.json());
 
     require('../api/routes/companies')(app);
+    require('../api/routes/jobs')(app);
 
     return app;
 };
