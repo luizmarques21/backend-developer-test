@@ -29,5 +29,10 @@ module.exports = () => {
         return res.sendStatus(200);
     }
 
+    controller.deleteJob = async (req, res) => {
+        await db.deleteJob(req.params.job_id);
+        return res.sendStatus(204);
+    }
+
     return controller;
 }

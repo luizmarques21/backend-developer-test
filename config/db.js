@@ -54,11 +54,17 @@ async function archiveJob(job_id) {
     await client.query(sql, values);
 }
 
+async function deleteJob(job_id) {
+    const client = await connect();
+    await client.query('DELETE FROM jobs WHERE id = $1', [job_id]);
+}
+
 module.exports = { 
     listCompanies, 
     getCompany, 
     saveJobDraft, 
     updateJob, 
     publishJob,
-    archiveJob
+    archiveJob,
+    deleteJob
 }
