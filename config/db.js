@@ -33,4 +33,11 @@ async function saveJobDraft(newJob) {
     await client.query(sql, values);
 }
 
-module.exports = { listCompanies, getCompany, saveJobDraft }
+async function updateJob(newJob) {
+    const client = await connect();
+    const sql = 'UPDATE jobs SET title = $1, location = $2, description = $3 WHERE id = $4';
+    const values = [newJob.title, newJob.location, newJob.description, newJob.id];
+    await client.query(sql, values);
+}
+
+module.exports = { listCompanies, getCompany, saveJobDraft, updateJob }

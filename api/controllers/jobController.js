@@ -5,12 +5,18 @@ module.exports = () => {
 
     controller.saveJobDraft = async (req, res) => {
         await db.saveJobDraft(req.body);
-        return res.send(201);
+        return res.sendStatus(201);
     }
 
-    controller.getCompany = async (req, res) => {
-        const company = await db.getCompany(req.params.company_id);
-        return res.json(company);
+    controller.updateJob = async (req, res) => {
+        const newJob = {
+            id: req.params.job_id,
+            title: req.body.title,
+            location: req.body.location,
+            description: req.body.description
+        }
+        await db.updateJob(newJob);
+        return res.sendStatus(200);
     }
 
     return controller;
