@@ -6,4 +6,5 @@ module.exports = app => {
     app.delete('/job/:job_id', controller.deleteJob);
     app.put('/job/:job_id/publish', controller.publishJob);
     app.put('/job/:job_id/archive', controller.archiveJob);
+    app.get('/feed', controller.getFeed);
 }

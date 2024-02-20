@@ -1,3 +1,14 @@
+const AWS = require('aws-sdk');
+AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+    region: process.env.AWS_REGION
+});
+const s3 = new AWS.S3();
+
+const NodeCache = require('node-cache');
+const myCache = new NodeCache();
+
 module.exports = () => {
     const db = require('../../config/db');
 
@@ -32,6 +43,27 @@ module.exports = () => {
     controller.deleteJob = async (req, res) => {
         await db.deleteJob(req.params.job_id);
         return res.sendStatus(204);
+    }
+
+    controller.getFeed = async (req, res) => {
+        try {
+            let content = myCache.get('jobFeed');
+
+            if (content == undefined) {
+                const params = {
+                    Bucket: process.env.BUCKET_NAME,
+                    Key: process.env.JOBS_OBJECT_KEY
+                };
+                const data = await s3.getObject(params).promise();
+                content = JSON.parse(data.Body.toString());
+                myCache.set('jobFeed', content, 60);
+            }
+
+            return res.status(200).json(content);
+        } catch (error) {
+            console.log('error',error);
+            return res.status(500).json({ message: 'Erro ao consultar os jobs publicados.' });
+        }
     }
 
     return controller;
