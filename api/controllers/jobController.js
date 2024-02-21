@@ -15,34 +15,103 @@ module.exports = () => {
     const controller = {};
 
     controller.saveJobDraft = async (req, res) => {
-        await db.saveJobDraft(req.body);
-        return res.sendStatus(201);
+        try {
+            const { company_id, title, description, location } = req.body;
+            if (!title || !description || !location) {
+                return res.status(400).json({ message: 'Campos obrigatórios não informados.' });
+            }
+
+            const company = await db.getCompany(company_id);
+            if (!company) {
+                return res.status(400).json({ message: 'ID da compainha é inválido.' });
+            }
+            
+            await db.saveJobDraft(req.body);
+            return res.status(201).json({ message: 'Job cadastrado com sucesso.' });
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Erro ao criar job." });
+        }
     }
 
     controller.updateJob = async (req, res) => {
-        const newJob = {
-            id: req.params.job_id,
-            title: req.body.title,
-            location: req.body.location,
-            description: req.body.description
+        try {
+            const { title, description, location } = req.body;
+            if (!title || !description || !location) {
+                return res.status(400).json({ message: 'Campos obrigatórios não informados.' });
+            }
+            
+            const newJob = {
+                id: req.params.job_id,
+                title: title,
+                location: location,
+                description: description
+            }
+            await db.updateJob(newJob);
+            return res.status(200).json({ message: 'Job atualizado com sucesso. '});
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Erro ao atualizar job." });
         }
-        await db.updateJob(newJob);
-        return res.sendStatus(200);
     }
 
     controller.publishJob = async (req, res) => {
-        await db.publishJob(req.params.job_id);
-        return res.sendStatus(200);
+        try {
+            const { job_id } = req.params;
+            
+            const job = await db.getJob(job_id);
+            if (!job) {
+                return res.status(400).json({ message: 'Job não encontrado.' });
+            }
+
+            if (job.status == 'published') {
+                return res.status(400).json({ message: 'O job informado já está publicado.' });
+            }
+            
+            await db.publishJob(job_id);
+            return res.status(200).json({ message: 'Job publicado com sucesso. '});
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Erro ao publicar job." });
+        }
     }
 
     controller.archiveJob = async (req, res) => {
-        await db.archiveJob(req.params.job_id);
-        return res.sendStatus(200);
+        try {
+            const { job_id } = req.params;
+            
+            const job = await db.getJob(job_id);
+            if (!job) {
+                return res.status(400).json({ message: 'Job não encontrado.' });
+            }
+
+            if (job.status == 'archived') {
+                return res.status(400).json({ message: 'O job informado já está arquivado.' });
+            }
+            
+            await db.archiveJob(job_id);
+            return res.status(200).json({ message: 'Job arquivado com sucesso. '});
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Erro ao arquivar job." });
+        }
     }
 
     controller.deleteJob = async (req, res) => {
-        await db.deleteJob(req.params.job_id);
-        return res.sendStatus(204);
+        try {
+            const { job_id } = req.params;
+            
+            const job = await db.getJob(job_id);
+            if (!job) {
+                return res.status(400).json({ message: 'Job não encontrado.' });
+            }
+            
+            await db.deleteJob(job_id);
+            return res.status(204).json({ message: 'Job apagado com sucesso. '});
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json({ message: "Erro ao apagar job." });
+        }
     }
 
     controller.getFeed = async (req, res) => {
@@ -61,7 +130,7 @@ module.exports = () => {
 
             return res.status(200).json(content);
         } catch (error) {
-            console.log('error',error);
+            console.log(error);
             return res.status(500).json({ message: 'Erro ao consultar os jobs publicados.' });
         }
     }
