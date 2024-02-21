@@ -5,6 +5,7 @@ AWS.config.update({
     region: process.env.AWS_REGION
 });
 const s3 = new AWS.S3();
+const sqs = new AWS.SQS();
 
 const NodeCache = require('node-cache');
 const myCache = new NodeCache();
@@ -68,8 +69,17 @@ module.exports = () => {
                 return res.status(400).json({ message: 'O job informado já está publicado.' });
             }
             
-            await db.publishJob(job_id);
-            return res.status(200).json({ message: 'Job publicado com sucesso. '});
+            const params = {
+                MessageBody: JSON.stringify(job),
+                QueueUrl: process.env.SQS_QUEUE_URL
+            };
+            sqs.sendMessage(params, (err) => {
+                if (err) {
+                    throw new Error(err);
+                } else {
+                    return res.status(200).json({ message: 'Job publicado com sucesso. '});
+                }
+            });
         } catch (error) {
             console.log(error);
             return res.status(500).json({ message: "Erro ao publicar job." });
